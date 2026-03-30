@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: Bank
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bankdb
+    username: your_db_username
+    password: your_db_password
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 300000
+      pool-name: BankHikariPool
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+    open-in-view: false
+
+server:
+  port: 8080
+  error:
+    include-message: never
+    include-stacktrace: never
+
+jwt:
+  secret: your_256bit_hex_secret_here
+  expiration: 86400000
+  refresh-expiration: 604800000
+
+logging:
+  level:
+    com.amarnath.BankingSystem: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN

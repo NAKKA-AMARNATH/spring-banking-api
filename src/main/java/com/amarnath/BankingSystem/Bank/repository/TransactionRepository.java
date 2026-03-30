@@ -1,0 +1,41 @@
+package com.amarnath.BankingSystem.Bank.repository;
+
+import com.amarnath.BankingSystem.Bank.entity.Transaction;
+import com.amarnath.BankingSystem.Bank.enums.TransactionStatus;
+import com.amarnath.BankingSystem.Bank.enums.TransactionType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+
+    Optional<Transaction> findByReferenceNumber(String referenceNumber);
+
+    @Query("SELECT t FROM Transaction t WHERE t.fromAccount.id = :accountId OR t.toAccount.id = :accountId ORDER BY t.createdAt DESC")
+    Page<Transaction> findByAccountId(@Param("accountId") Long accountId, Pageable pageable);
+
+    @Query("SELECT t FROM Transaction t WHERE (t.fromAccount.id = :accountId OR t.toAccount.id = :accountId) AND t.type = :type ORDER BY t.createdAt DESC")
+    List<Transaction> findByAccountIdAndType(@Param("accountId") Long accountId, @Param("type") TransactionType type);
+
+    @Query("SELECT t FROM Transaction t WHERE (t.fromAccount.id = :accountId OR t.toAccount.id = :accountId) AND t.createdAt BETWEEN :from AND :to ORDER BY t.createdAt DESC")
+    List<Transaction> findByAccountIdAndDateRange(
+            @Param("accountId") Long accountId,
+            @Param("from") LocalDateTime from,
+            @Param("to") LocalDateTime to);
+
+    List<Transaction> findByStatus(TransactionStatus status);
+
+    @Query("SELECT t FROM Transaction t WHERE t.fromAccount.id = :accountId ORDER BY t.createdAt DESC")
+    List<Transaction> findOutgoingByAccountId(@Param("accountId") Long accountId);
+
+    @Query("SELECT t FROM Transaction t WHERE t.toAccount.id = :accountId ORDER BY t.createdAt DESC")
+    List<Transaction> findIncomingByAccountId(@Param("accountId") Long accountId);
+}
